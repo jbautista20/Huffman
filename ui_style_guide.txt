@@ -1,0 +1,22 @@
+# GUÍA DE ESTILO Y ESTRUCTURA - PROYECTO JAVAFAX
+
+## 1. Dimensiones y Layout
+- Ventana Principal (Scene): 1100x600 píxeles.
+- Contenedor Raíz: VBox con padding de 10px.
+- Espaciado en Barras: HBox (topBar) con espaciado entre elementos de 10px y alineación Pos.CENTER_LEFT.
+- División Central: SplitPane con dos columnas de igual ancho.
+
+## 2. Componentes de Visualización
+- Contenedores de texto: ScrollPane con ScrollPane.setFitToWidth(true).
+- Tipo de flujo de texto: TextFlow para permitir el renderizado de caracteres individuales con colores.
+- Sincronización: El scroll vertical (vvalueProperty) de ambos paneles debe estar vinculado bidireccionalmente.
+
+## 3. Identidad Visual y Tipografía
+- Fuente de datos: "Monospaced", tamaño 14.
+- Color de Estado (Normal): Color.NAVY o Color.GREEN.
+- Color de Error: Color.RED.
+- Resaltado de diferencias: Texto en Color.RED con estilo "-fx-font-weight: bold".
+
+## 4. Comportamiento de UI
+- Los botones deben tener un padding visual en el texto (ej: " Botón ").
+- Barra de estado inferior: Label con padding de 5px y alineación inferior.
