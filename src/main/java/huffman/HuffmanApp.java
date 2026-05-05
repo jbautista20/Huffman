@@ -19,7 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class HuffmanApp extends Application {
-
+    // Comentario de prueba
     private File currentOriginalFile;
     private File currentCompressedFile;
     private File currentDecompressedFile;
