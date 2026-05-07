@@ -10,12 +10,14 @@ public class HuffmanCoder {
         // 1. Contar frecuencias
         Map<Byte, Integer> frequencies = new HashMap<>();
         try (FileInputStream fis = new FileInputStream(input)) {
-            byte[] buffer = new byte[8192];
+            byte[] buffer = new byte[8192];     // Trae 8kb del disco a RAM para agilizar la lectura
             int bytesRead;
             while ((bytesRead = fis.read(buffer)) != -1) {
                 for (int i = 0; i < bytesRead; i++) {
                     byte b = buffer[i];
-                    frequencies.put(b, frequencies.getOrDefault(b, 0) + 1);
+                    frequencies.put(b, frequencies.getOrDefault(b, 0) + 1); //busca al caracter y le suma 1
+                                                                                        //a la frecuencia. Si no estaba
+                                                                                        //comienza su frecuenci en 0+1
                 }
             }
         }
@@ -31,22 +33,22 @@ public class HuffmanCoder {
         }
 
         // 2. Construir árbol
-        PriorityQueue<HuffmanNode> pq = new PriorityQueue<>();
+        PriorityQueue<HuffmanNode> pq = new PriorityQueue<>();      //cola de prioridad, con .poll traeré el mas bajo
         for (Map.Entry<Byte, Integer> entry : frequencies.entrySet()) {
-            pq.add(new HuffmanNode(entry.getKey(), entry.getValue()));
+            pq.add(new HuffmanNode(entry.getKey(), entry.getValue()));      // Poblar la cola con nodos.
         }
 
         while (pq.size() > 1) {
-            HuffmanNode left = pq.poll();
-            HuffmanNode right = pq.poll();
-            pq.add(new HuffmanNode(left, right));
+            HuffmanNode left = pq.poll();           // Saca el mas chico
+            HuffmanNode right = pq.poll();          // Saca el segundo mas chico
+            pq.add(new HuffmanNode(left, right));   // Los une y agrega al padre de nuevo a la pq
         }
 
-        HuffmanNode root = pq.poll();
+        HuffmanNode root = pq.poll();       // Cuando solo queda uno en la pq, entonces es la raiz
 
         // 3. Generar códigos
-        Map<Byte, String> huffmanCodes = new HashMap<>();
-        generateCodes(root, "", huffmanCodes);
+        Map<Byte, String> huffmanCodes = new HashMap<>();       // { cod: CHAR, ... , 001: B, ..., }
+        generateCodes(root, "", huffmanCodes);              // retorna el map con los códigos
 
         // 4. Escribir archivo comprimido
         try (FileOutputStream fos = new FileOutputStream(output);
@@ -74,14 +76,14 @@ public class HuffmanCoder {
                 int bytesRead;
                 while ((bytesRead = fis.read(buffer)) != -1) {
                     for (int i = 0; i < bytesRead; i++) {
-                        String code = huffmanCodes.get(buffer[i]);
-                        for (char c : code.toCharArray()) {
-                            currentByte = (currentByte << 1) | (c - '0');
-                            numBits++;
+                        String code = huffmanCodes.get(buffer[i]);      // Código en string ej: "101"
+                        for (char c : code.toCharArray()) {             //itero sacando cada numm del código
+                            currentByte = (currentByte << 1) | (c - '0');   // " c - '0' " me da el valor del num
+                            numBits++;                                      // '1' = 49, '0' = 48 --> 49-48 = 1
                             if (numBits == 8) {
-                                dos.write(currentByte);
-                                currentByte = 0;
-                                numBits = 0;
+                                dos.write(currentByte);         // Cuando complete el Byte, lo escribo en el archivo
+                                currentByte = 0;            //ej: 0110 0101 --> referencia a caracteres: 01,100, 101
+                                numBits = 0;                //luego paso a otro bloque de 1 byte para seguir guardando.
                             }
                         }
                     }
@@ -102,8 +104,8 @@ public class HuffmanCoder {
             // Caso especial de un solo caracter en todo el archivo
             huffmanCodes.put(node.data, code.isEmpty() ? "0" : code);
         }
-        generateCodes(node.left, code + "0", huffmanCodes);
-        generateCodes(node.right, code + "1", huffmanCodes);
+        generateCodes(node.left, code + "0", huffmanCodes);     // Por la izquierda codifico ccon 0
+        generateCodes(node.right, code + "1", huffmanCodes);    // derecha codifico con 1
     }
 
     // Descomprime el archivo input (.huf) y lo guarda en output (.dhu)
@@ -170,7 +172,7 @@ public class HuffmanCoder {
 
                 int byteRead;
                 while (bytesWritten < originalLength && (byteRead = dis.read()) != -1) {
-                    for (int i = 7; i >= 0; i--) {
+                    for (int i = 7; i >= 0; i--) {      //saca los bits de cada Byte leido
                         int bit = (byteRead >> i) & 1;
                         if (bit == 0) {
                             current = current.left;
